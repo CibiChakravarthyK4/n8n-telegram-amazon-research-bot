@@ -1,7 +1,5 @@
 # n8n-telegram-amazon-research-bot
 
-# 🛒 Telegram Amazon Research Agent
-
 An intelligent n8n AI agent that brings live Amazon product research directly to your Telegram chat.
 
 [ Telegram Trigger ] ──► [ Research Agent ] ──► [ Telegram Response ]
