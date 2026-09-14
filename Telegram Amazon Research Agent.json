@@ -1,0 +1,203 @@
+{
+  "name": "Telegram Amazon Research Agent",
+  "nodes": [
+    {
+      "parameters": {
+        "updates": [
+          "message"
+        ],
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegramTrigger",
+      "typeVersion": 1.5,
+      "position": [
+        -544,
+        -16
+      ],
+      "id": "b3bf9c6c-f6c2-4f3d-828c-3f5697c6017d",
+      "name": "Telegram Trigger",
+      "webhookId": "e538db23-ae67-4320-af51-2f4543293f04",
+      "credentials": {
+        "telegramApi": {
+          "id": "WXeoxzVden70D4gH",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-4.1-mini",
+          "mode": "list",
+          "cachedResultName": "gpt-4.1-mini"
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [
+        -336,
+        144
+      ],
+      "id": "8df2478f-c37b-4e10-9f78-f9e6d38b8bce",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "RQiwvF5a2qeeDjC8",
+          "name": "OpenAI account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "=telegram_{{ $json.message.chat.id }}",
+        "contextWindowLength": 2
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.4,
+      "position": [
+        -112,
+        128
+      ],
+      "id": "7629f570-d2e2-4b36-955e-0a53753a8908",
+      "name": "Simple Memory"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=You are an helpful agent, Act based on the user input below: {{ $json.message.text }}\n\n\n",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        -240,
+        -96
+      ],
+      "id": "983c7ba2-185e-4515-ac36-2b51d5af0f7d",
+      "name": "Research Agent"
+    },
+    {
+      "parameters": {
+        "operation": "amazon",
+        "k": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Search_Query__k_', ``, 'string') }}",
+        "additionalFields": {
+          "delivery_zip": "600091"
+        },
+        "requestOptions": {}
+      },
+      "type": "n8n-nodes-serpapi.serpApiTool",
+      "typeVersion": 1,
+      "position": [
+        160,
+        96
+      ],
+      "id": "01284734-1bd4-4c7b-b92c-4754096accb6",
+      "name": "Amazon search in SerpApi",
+      "credentials": {
+        "serpApi": {
+          "id": "zs2ywWFrUTsjmfvE",
+          "name": "SerpApi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Telegram Trigger').item.json.message.chat.id }}",
+        "text": "={{ $json.output }}",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        256,
+        -112
+      ],
+      "id": "e0288a1c-7ea1-4862-a74c-3da58b8ec5e0",
+      "name": "Send a text message",
+      "webhookId": "5008d391-9327-4e82-a7e7-63a346af42c0",
+      "credentials": {
+        "telegramApi": {
+          "id": "WXeoxzVden70D4gH",
+          "name": "Telegram account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Telegram Trigger": {
+      "main": [
+        [
+          {
+            "node": "Research Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Research Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "Research Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Amazon search in SerpApi": {
+      "ai_tool": [
+        [
+          {
+            "node": "Research Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Research Agent": {
+      "main": [
+        [
+          {
+            "node": "Send a text message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "afe8ae31-091b-4210-9e8e-0aa4d96016f8",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "409e70f4c790c419c27c27bf1698fd15ae3fa6bc3dcde3ad66c1b45b9e4dadf3"
+  },
+  "nodeGroups": [],
+  "id": "fBqXjGJ3Ruq7Mhjo",
+  "tags": []
+}
